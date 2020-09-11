@@ -10,19 +10,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
 
 
-'''
-    Gradient Descent Function
-        ~ Inputs:
-            ~ x = input attributes
-            ~ y = output
-            ~ weights = initialized weights
-            ~ LR = learning rate
-            ~ iterations = number of iterations
-        ~ Returns:
-            ~ final weights 
-            ~ Mean Squared Error array to be graphed
-'''
-def enhanced_gradient_descent(x, y, weights, LR, iterations):
+def vanilla_gradient_descent(x, y, weights, LR, iterations):
     # Graph MSE
     MSEgraph = np.zeros((iterations,1))
     for k in range(iterations):
@@ -40,6 +28,61 @@ def enhanced_gradient_descent(x, y, weights, LR, iterations):
         # Revise Weights
         # New Weight = Old Weight - Learning Rate * Gradient
         weights = np.subtract(weights, LR * gradient)
+    return weights, MSEgraph
+
+'''
+    Gradient Descent Function
+    Implements Adam Optimizer
+        ~ Inputs:
+            ~ x = input attributes
+            ~ y = output
+            ~ weights = initialized weights
+            ~ iterations = number of iterations
+        ~ Returns:
+            ~ final weights 
+            ~ Mean Squared Error array to be graphed
+'''
+def enhanced_gradient_descent(x, y, weights, iterations):
+    # Adam Optimizer Variables
+    # Recommended values: alpha = 0.001, beta1 = 0.9, beta2 = 0.999 and epsilon = 10**−8
+    alpha = .001
+    beta1 = .9
+    beta2 = .999
+    epsilon = 10**-8
+    m = 0
+    v = 0
+
+    # Graph MSE
+    MSEgraph = np.zeros((iterations,1))
+
+    for k in range(iterations):
+        # Initialize Hypothesis
+        H = np.dot(x, weights)
+
+        # Define Error
+        # E = H - Y
+        E = np.subtract(H, y)
+
+        # Define Mean Squared Error
+        MSE = (1 / (2 * (int(len(y))))) * np.dot(np.transpose(E), E)
+        # Place MSE value in correct array placement
+        MSEgraph[k] = MSE
+
+        # Define Gradient -> MSE derivative to weight
+        gradient = (1 / (int(len(y)))) * np.dot(np.transpose(x), E)
+
+        # Calculate m for gradient component
+        m = (beta1 * m) + ((1 - beta1) * gradient)
+        # Calculate v for learing rate component
+        v = (beta2 * v) + ((1 - beta2) * (gradient**2))
+
+        # Get Adam Equation for weight update
+        adam_equation = (((alpha)/(np.sqrt(v) + epsilon)) * m)
+
+        # Revise Weights
+        # New Weight = Old Weight - Adam Equation
+        weights = np.subtract(weights, adam_equation)
+
     return weights, MSEgraph
 
 '''
@@ -138,14 +181,16 @@ def main(state):
         Call the Enhanced Gradient Descent Function
             ~ Intialize weights, learning rate, iterations
             ~ Call Enhanced Gradient Descent Function
+            !!! IMPORTANT !!!
+            The Enhanced Gradient Descent implements the Adam optimizer.
+            The special optimizer values are defined in the function.
+            Special Optimizer values include: alpha, beta1, beta2, and epsilon
     '''
     # Initialize Weights
     Weights = np.array([[0],[0],[0],[0],[0]])
-    # Initialize Learning Rate
-    LR = .0001
     # Initialize Iterations
-    iterations = 70000
-    Final_Weights, MSEgraph = enhanced_gradient_descent(processed_info[0], processed_info[1], Weights, LR, iterations)
+    iterations = 30000
+    Final_Weights, MSEgraph = enhanced_gradient_descent(processed_info[0], processed_info[1], Weights, iterations)
 
     '''
     Graphic Display ~ Mean Squared Error
