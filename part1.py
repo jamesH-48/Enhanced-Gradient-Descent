@@ -142,6 +142,14 @@ def pre_process(data, state, drop_cols, print_data_graphs, split_size):
     # Convert to numpy array
     X = data_x.to_numpy()
     Y = data_y.to_numpy()
+
+    '''
+        Add Bias Term
+            ~ Column of 1's
+    '''
+    bias = np.ones(shape=(X.shape[0],1))
+    X = np.append(bias, X, axis=1)
+
     return train_test_split(X, Y, test_size=split_size, random_state=state)
 
 '''
@@ -171,7 +179,7 @@ def main(state):
             ~ Returns:
                 ~ x_train, x_test, y_train, y_test from train-test split of the pre-processed data
     '''
-    drop_cols = False
+    drop_cols = True
     X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs=False, split_size=.1)
 
     print("X_train: ", X_train.shape)
@@ -190,9 +198,9 @@ def main(state):
     '''
     if drop_cols:
         # Initialize Weights
-        Weights = np.array([[0],[0],[0],[0]])
+        Weights = np.array([[0],[0],[0],[0], [0]])
     else:
-        Weights = np.array([[0], [0], [0], [0], [0]])
+        Weights = np.array([[0], [0], [0], [0], [0], [0]])
     # Initialize Iterations
     iterations = 30000
     Final_Weights, MSEgraph = enhanced_gradient_descent(X_train, Y_train, Weights, iterations)
