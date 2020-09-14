@@ -47,7 +47,7 @@ def enhanced_gradient_descent(x, y, weights, iterations):
     alpha = .001
     beta1 = .9
     beta2 = .999
-    epsilon = 10**-7
+    epsilon = 10**-8
     m = 0
     v = 0
 
@@ -163,9 +163,6 @@ def main(state):
     url = "https://raw.githubusercontent.com/jamesH-48/Enhanced-Gradient-Descent/master/Combined%20Cycle%20Power%20Plant%20.csv"
     data = pd.read_csv(url, header=0)
 
-    print(data)
-    values = data.values
-
     '''
         Pre-Processing
             ~ Can set if you want to print graphs out or not.
@@ -180,12 +177,16 @@ def main(state):
                 ~ x_train, x_test, y_train, y_test from train-test split of the pre-processed data
     '''
     drop_cols = False
-    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs=True, split_size=.1)
+    print_data_graphs = False
+    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs, split_size=.1)
 
+    '''
     print("X_train: ", X_train.shape)
     print("X_test: ", X_test.shape)
     print("Y_train: ", Y_train.shape)
     print("Y_test: ", Y_test.shape)
+    '''
+
 
     '''
         Call the Enhanced Gradient Descent Function
@@ -202,7 +203,7 @@ def main(state):
     else:
         Weights = np.array([[0], [0], [0], [0], [0]])
     # Initialize Iterations
-    iterations = 30000
+    iterations = 10000
     Final_Weights, MSEgraph = enhanced_gradient_descent(X_train, Y_train, Weights, iterations)
 
     '''
