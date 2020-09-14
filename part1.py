@@ -223,10 +223,7 @@ def main(state):
     # Get Y prediction Values from Test Data x Weights Found
     # Compare Y prediction Values with actual output values from test data set
     Y_pred1 = np.dot(X_train, Final_Weights)
-    print("FW", Final_Weights.shape)
-    print("Y_pred1: ", Y_pred1.shape)
     Y_pred2 = np.dot(X_test, Final_Weights)
-    print("Y_pred2: ", Y_pred2.shape)
 
     # Coefficients
     coef = []  # Initialize
