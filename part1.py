@@ -7,7 +7,6 @@ import numpy as np
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import StandardScaler
 
 
 def vanilla_gradient_descent(x, y, weights, LR, iterations):
@@ -92,12 +91,15 @@ def enhanced_gradient_descent(x, y, weights, iterations):
         ~ Graphic Display: 
             ~ Displays graphs about the Data for analysis
 '''
-def pre_process(data, state, print_data_graphs, drop_cols, split_size):
+def pre_process(data, state, drop_cols, print_data_graphs, split_size):
     '''
         Process Data ~ Drop Duplicates
             ~ Keep first instances of duplicates
     '''
     data.drop_duplicates(keep='first', inplace=True)
+
+    # null value check
+    # print("null",data.isnull().sum())
 
     if print_data_graphs == True:
         '''
@@ -130,7 +132,7 @@ def pre_process(data, state, print_data_graphs, drop_cols, split_size):
             ~ We can choose Suction S.D.T or Angle of Attack here.
     '''
     if drop_cols == True:
-        data = data.drop(columns=['Suction S.D.T'])
+        data = data.drop(columns=['Suction S.D.T.'])
 
     '''
         Process Data ~ Split & Scale Data
@@ -138,14 +140,7 @@ def pre_process(data, state, print_data_graphs, drop_cols, split_size):
     data_x = data.drop(data.columns[-1], axis=1)
     data_y = data[['Sound Pressure Level']]
 
-    # Define scaler
-    scaler = StandardScaler()
-    # Transform Data
-    scaled_data_x = scaler.fit_transform(data_x)
-
-    x_train, x_test, y_train, y_test = train_test_split(scaled_data_x, data_y, test_size=split_size, random_state=state)
-
-    return x_train, y_train, x_test, y_test, scaler
+    return train_test_split(data_x, data_y, test_size=split_size, random_state=state)
 
 '''
     Driver Function
@@ -162,20 +157,24 @@ def main(state):
 
     '''
         Pre-Processing
-            ~ Will be using standard scaler.
             ~ Can set if you want to print graphs out or not.
             ~ Can drop columns that are deemed droppable.
+            ~ Drop columns deemed necessary
+            ~ There was a check for NaN values
             ~ Can set train/test split size
-                ~ .9 -> 90% train 10% test
-                ~ .8 -> 80% train 20% test
+                ~ .1 -> 90% train 10% test
+                ~ .2 -> 80% train 20% test
                 ~ etc.
             ~ Returns:
-                    0         1        2       3       4
-                ~ x_train, y_train, x_test, y_test, scaler
-                ~ We will retrieve this as a list for ease of use.
+                ~ x_train, x_test, y_train, y_test from train-test split of the pre-processed data
     '''
-    processed_info = []
-    processed_info = pre_process(data, state, print_data_graphs=False, drop_cols=False, split_size=.9)
+    drop_cols = True
+    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs=False, split_size=.1)
+
+    print("X_train: ", X_train.shape)
+    print("X_test: ", X_test.shape)
+    print("Y_train: ", Y_train.shape)
+    print("Y_test: ", Y_test.shape)
 
     '''
         Call the Enhanced Gradient Descent Function
@@ -186,11 +185,14 @@ def main(state):
             The special optimizer values are defined in the function.
             Special Optimizer values include: alpha, beta1, beta2, and epsilon
     '''
-    # Initialize Weights
-    Weights = np.array([[0],[0],[0],[0],[0]])
+    if drop_cols:
+        # Initialize Weights
+        Weights = np.array([[0],[0],[0],[0]])
+    else:
+        Weights = np.array([[0], [0], [0], [0], [0]])
     # Initialize Iterations
     iterations = 30000
-    Final_Weights, MSEgraph = enhanced_gradient_descent(processed_info[0], processed_info[1], Weights, iterations)
+    Final_Weights, MSEgraph = enhanced_gradient_descent(X_train, Y_train, Weights, iterations)
 
     '''
     Graphic Display ~ Mean Squared Error
@@ -202,11 +204,55 @@ def main(state):
 
     plt.show()
 
+    '''
+        Final Values Print ~ Mean Squared Error & R^2
+        '''
+    # Apply Model found Weights to Test Data Set
+    # Get Y prediction Values from Test Data x Weights Found
+    # Compare Y prediction Values with actual output values from test data set
+    Y_pred1 = np.dot(X_train, Final_Weights)
+    print("Y_pred1: ", Y_pred1.shape)
+    Y_pred2 = np.dot(X_test, Final_Weights)
+    print("Y_pred2: ", Y_pred2.shape)
+    # Parameters Used
+
+    # Coefficients
+    coef = []  # Initialize
+    for i in range(Final_Weights.shape[0]):  # For Print & Bar Graph
+        coef.append(Final_Weights[i][0])
+    print('Coefficients: \n', coef)
+    # Train Accuracy
+    print("Train Accuracy:")
+    print("Mean Squared Error: ", mean_squared_error(Y_pred1, Y_train))
+    print("R^2 Value: ", r2_score(Y_pred1, Y_train))
+    # Test Accuracy
+    print("Test Accuracy:")
+    print("Mean Squared Error: ", mean_squared_error(Y_pred2, Y_test))
+    print("R^2 Value: ", r2_score(Y_pred2, Y_test))
+
+    '''
+    Graphic Display ~ Train Accuracy & Test Accuracy Plots
+    '''
+    # Print Plot of Outputs
+    figure1, ax = plt.subplots()
+    figure2, ax2 = plt.subplots()
+    ax.plot(Y_train, color='red', markersize=5, label="Actual")
+    ax.plot(Y_pred1, color='cyan', markersize=5, label="Prediction")
+    ax.set_title('Y Train Dataset')
+    ax.set_xlabel('No. of Values')
+    ax.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.)
+    ax2.plot(Y_test, color='black', markersize=5, label="Actual")
+    ax2.plot(Y_pred2, color='magenta', markersize=5, label="Prediction")
+    ax2.set_title('Y Test Dataset')
+    ax2.set_xlabel('No. of Values')
+    ax2.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.)
+
+    plt.show()
 '''
     Main Function
 '''
 if __name__ == '__main__':
     print("Part 1 of Enhanced Gradient Descent")
     # State is the seeded order of data that is randomized in train-test-split from sklearn
-    state = 0
+    state = 1
     main(state)
