@@ -98,13 +98,13 @@ def pre_process(data, state, drop_cols, print_data_graphs, split_size):
     '''
     data.drop_duplicates(keep='first', inplace=True)
 
-    # null value check
-    # print("null",data.isnull().sum())
-
     if print_data_graphs == True:
+        # null value check
+        print("null", data.isnull().sum())
+
         '''
             Graphic Display ~ Attribute Correlation Heatmap 
-                COMMENT: Suction S.D.T. & Angle of Attack have .75 correlation value.
+                COMMENT: AT & V have .84 correlation
         '''
         # Comptue pairwise correlation of columns
         corr = data.corr()
@@ -120,7 +120,7 @@ def pre_process(data, state, drop_cols, print_data_graphs, split_size):
         '''
         i = 1
         for column in data:
-            plt.subplot(6, 1, i)
+            plt.subplot(5, 1, i)
             plt.subplots_adjust(hspace=1.2)
             data[column].plot(color='#c73f24')
             plt.title(column, y=1.00, loc='center', color='#23c48e', fontsize=24, fontweight=24)
@@ -129,16 +129,16 @@ def pre_process(data, state, drop_cols, print_data_graphs, split_size):
 
     '''
         Process Data ~ Drop Columns
-            ~ We can choose Suction S.D.T or Angle of Attack here.
+            ~ We can choose AT or V here.
     '''
     if drop_cols == True:
-        data = data.drop(columns=['Suction S.D.T.'])
+        data = data.drop(columns=['AT'])
 
     '''
         Process Data ~ Split & Scale Data
     '''
     data_x = data.drop(data.columns[-1], axis=1)
-    data_y = data[['Sound Pressure Level']]
+    data_y = data[['PE']]
     # Convert to numpy array
     X = data_x.to_numpy()
     Y = data_y.to_numpy()
@@ -160,7 +160,7 @@ def main(state):
     # Frequency, Angle of Attack, Chord Length, Free-Stream Velocity, Suction S.D.T., Sound Pressure Level
     # 5 input variables, 1 output variable
     # Retrieve Data from GitHub Repository
-    url = "https://raw.githubusercontent.com/jamesH-48/Enhanced-Gradient-Descent/master/airfoil_self_noise.csv"
+    url = "https://raw.githubusercontent.com/jamesH-48/Enhanced-Gradient-Descent/master/Combined%20Cycle%20Power%20Plant%20.csv"
     data = pd.read_csv(url, header=0)
 
     print(data)
@@ -179,8 +179,8 @@ def main(state):
             ~ Returns:
                 ~ x_train, x_test, y_train, y_test from train-test split of the pre-processed data
     '''
-    drop_cols = True
-    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs=False, split_size=.1)
+    drop_cols = False
+    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs=True, split_size=.1)
 
     print("X_train: ", X_train.shape)
     print("X_test: ", X_test.shape)
@@ -198,9 +198,9 @@ def main(state):
     '''
     if drop_cols:
         # Initialize Weights
-        Weights = np.array([[0],[0],[0],[0], [0]])
+        Weights = np.array([[0],[0],[0],[0]])
     else:
-        Weights = np.array([[0], [0], [0], [0], [0], [0]])
+        Weights = np.array([[0], [0], [0], [0], [0]])
     # Initialize Iterations
     iterations = 30000
     Final_Weights, MSEgraph = enhanced_gradient_descent(X_train, Y_train, Weights, iterations)
