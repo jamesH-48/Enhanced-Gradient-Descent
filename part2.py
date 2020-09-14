@@ -180,7 +180,7 @@ def main(state):
     x = np.arange(len(labels))  # Location of Labels
     width = .5  # Width of the bars
     figureW, axW = plt.subplots()
-    bars = axW.bar(x, regr.coef_[0], width, color='#ff4f72')  # Coef is from Weight Print
+    bars = axW.bar(x, regr.coef_, width, color='#ff4f72')  # Coef is from Weight Print
     axW.set_ylabel('Weight')
     axW.set_title('Coefficients')
     axW.set_xticks(x)
