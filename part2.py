@@ -1,4 +1,4 @@
-# Assignment 1 ~ part2
+# Assignment 1 ~ part1
 # James Hooper ~ NETID: jah171230
 # Hritik Panchasara ~ NETID: hhp160130
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ import numpy as np
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import SGDRegressor
 
 '''
     Pre-Processing Function
@@ -113,12 +113,21 @@ def main(state):
     '''
 
     '''
-        Call Sklearn Linear Regression Model
+        Call Sklearn Stochastic Gradient Descent Regressor
+            ~ Since we can't find anything that uses the Adam Optimizer we will use this.
+            ~ We will be using the default values unless specified otherwise.
+            ~ Default values can be found here: 
+            ~ https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDRegressor.html#sklearn.linear_model.SGDRegressor
     '''
+    # Initialize Iterations
+    iterations = 10000
+    # Initialize Learning Rate
+    LR = .000001
+
     # Create Linear Regression Object
-    regr = LinearRegression()
+    regr = SGDRegressor(loss="squared_loss", penalty=None, max_iter=iterations, eta0=LR)
     # Train the model using the training datasets
-    regr.fit(X_train,Y_train)
+    regr.fit(X_train,Y_train.ravel())
     # Make predictions using the testing dataset
     Y_pred1 = regr.predict(X_train)
     Y_pred2 = regr.predict(X_test)
@@ -135,7 +144,7 @@ def main(state):
     print("State: ", state)
 
     # Coefficients
-    print('Coefficients: \n', regr.coef_[0])
+    print('Coefficients: \n', regr.coef_)
     # Train Accuracy
     print("Train Accuracy:")
     print("Mean Squared Error: ", mean_squared_error(Y_pred1,Y_train))
