@@ -47,7 +47,7 @@ def enhanced_gradient_descent(x, y, weights, iterations):
     alpha = .001
     beta1 = .9
     beta2 = .999
-    epsilon = 10**-8
+    epsilon = 10**-7
     m = 0
     v = 0
 
@@ -139,8 +139,10 @@ def pre_process(data, state, drop_cols, print_data_graphs, split_size):
     '''
     data_x = data.drop(data.columns[-1], axis=1)
     data_y = data[['Sound Pressure Level']]
-
-    return train_test_split(data_x, data_y, test_size=split_size, random_state=state)
+    # Convert to numpy array
+    X = data_x.to_numpy()
+    Y = data_y.to_numpy()
+    return train_test_split(X, Y, test_size=split_size, random_state=state)
 
 '''
     Driver Function
@@ -152,6 +154,7 @@ def main(state):
     # Retrieve Data from GitHub Repository
     url = "https://raw.githubusercontent.com/jamesH-48/Enhanced-Gradient-Descent/master/airfoil_self_noise.csv"
     data = pd.read_csv(url, header=0)
+
     print(data)
     values = data.values
 
@@ -168,7 +171,7 @@ def main(state):
             ~ Returns:
                 ~ x_train, x_test, y_train, y_test from train-test split of the pre-processed data
     '''
-    drop_cols = True
+    drop_cols = False
     X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs=False, split_size=.1)
 
     print("X_train: ", X_train.shape)
@@ -211,10 +214,10 @@ def main(state):
     # Get Y prediction Values from Test Data x Weights Found
     # Compare Y prediction Values with actual output values from test data set
     Y_pred1 = np.dot(X_train, Final_Weights)
+    print("FW", Final_Weights.shape)
     print("Y_pred1: ", Y_pred1.shape)
     Y_pred2 = np.dot(X_test, Final_Weights)
     print("Y_pred2: ", Y_pred2.shape)
-    # Parameters Used
 
     # Coefficients
     coef = []  # Initialize
@@ -254,5 +257,5 @@ def main(state):
 if __name__ == '__main__':
     print("Part 1 of Enhanced Gradient Descent")
     # State is the seeded order of data that is randomized in train-test-split from sklearn
-    state = 1
+    state = 4
     main(state)
