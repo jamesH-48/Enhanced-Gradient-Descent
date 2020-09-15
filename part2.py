@@ -1,4 +1,4 @@
-# Assignment 1 ~ part1
+# Assignment 1 ~ part2
 # James Hooper ~ NETID: jah171230
 # Hritik Panchasara ~ NETID: hhp160130
 import matplotlib.pyplot as plt
