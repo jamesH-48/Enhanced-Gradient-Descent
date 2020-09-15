@@ -157,7 +157,7 @@ def main(state):
     '''
     drop_cols = False
     print_data_graphs = False
-    split_size = .1
+    split_size = .2
     X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs, split_size)
 
     '''
