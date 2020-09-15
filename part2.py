@@ -103,7 +103,8 @@ def main(state):
     '''
     drop_cols = False
     print_data_graphs = False
-    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs, split_size=.1)
+    split_size = .1
+    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs, split_size=split_size)
 
     '''
     print("X_train: ", X_train.shape)
@@ -142,6 +143,8 @@ def main(state):
     # Parameters Used
     print("Parameters Used:")
     print("State: ", state)
+    print("Iterations: ", iterations)
+    print("Learning Rate: ", LR)
 
     # Coefficients
     print('Coefficients: \n', regr.coef_)
@@ -194,5 +197,5 @@ def main(state):
 if __name__ == '__main__':
     print("Part 2 of Enhanced Gradient Descent")
     # State is the seeded order of data that is randomized in train-test-split from sklearn
-    state = 4
+    state = 5
     main(state)
