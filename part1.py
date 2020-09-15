@@ -8,27 +8,6 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 
-
-def vanilla_gradient_descent(x, y, weights, LR, iterations):
-    # Graph MSE
-    MSEgraph = np.zeros((iterations,1))
-    for k in range(iterations):
-        # Initialize Hypothesis
-        H = np.dot(x, weights)
-        # Define Error
-        # E = H - Y
-        E = np.subtract(H, y)
-        # Define Mean Squared Error
-        MSE = (1 / (2 * (int(len(y))))) * np.dot(np.transpose(E), E)
-        # Place MSE value in correct array placement
-        MSEgraph[k] = MSE
-        # Define Gradient -> MSE derivative to weight
-        gradient = (1 / (int(len(y)))) * np.dot(np.transpose(x), E)
-        # Revise Weights
-        # New Weight = Old Weight - Learning Rate * Gradient
-        weights = np.subtract(weights, LR * gradient)
-    return weights, MSEgraph
-
 '''
     Gradient Descent Function
     Implements Adam Optimizer
@@ -178,7 +157,8 @@ def main(state):
     '''
     drop_cols = False
     print_data_graphs = False
-    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs, split_size=.1)
+    split_size = .1
+    X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs, split_size)
 
     '''
     print("X_train: ", X_train.shape)
@@ -217,13 +197,26 @@ def main(state):
     plt.show()
 
     '''
-        Final Values Print ~ Mean Squared Error & R^2
-        '''
+        Final Values Print 
+            ~ Mean Squared Error & R^2
+            ~ Parameters Used
+            ~ Coefficients
+            ~ Graphs
+    '''
     # Apply Model found Weights to Test Data Set
     # Get Y prediction Values from Test Data x Weights Found
     # Compare Y prediction Values with actual output values from test data set
     Y_pred1 = np.dot(X_train, Final_Weights)
     Y_pred2 = np.dot(X_test, Final_Weights)
+
+    # Parameters Used
+    print("Parameters Used:")
+    print("State: ", state)
+    # Adam Optimizer Variables
+    # Recommended values: alpha = 0.001, beta1 = 0.9, beta2 = 0.999 and epsilon = 10**−8
+    print("Alpha: .001\t|Beta1: .9\t|Beta2: .999\t|Epsilon: 10^-8\t|m = 0\t|v = 0")
+    print("Iterations: ", iterations)
+    print("Train Split: ", (1 - split_size)*100, "%\t|Test Split: ", split_size*100, "%")
 
     # Coefficients
     coef = []  # Initialize
@@ -245,23 +238,40 @@ def main(state):
     # Print Plot of Outputs
     figure1, ax = plt.subplots()
     figure2, ax2 = plt.subplots()
-    ax.plot(Y_train, color='red', markersize=5, label="Actual")
-    ax.plot(Y_pred1, color='cyan', markersize=5, label="Prediction")
+    # Can't really gather anything from this graph since it is so dense.
+    ax.plot(Y_train, color='#060064', markersize=5, label="Actual")
+    ax.plot(Y_pred1, color='#daff4f', markersize=5, label="Prediction")
     ax.set_title('Y Train Dataset')
     ax.set_xlabel('No. of Values')
     ax.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.)
     ax2.plot(Y_test, color='black', markersize=5, label="Actual")
-    ax2.plot(Y_pred2, color='magenta', markersize=5, label="Prediction")
+    ax2.plot(Y_pred2, color='#00ffc3', markersize=5, label="Prediction")
     ax2.set_title('Y Test Dataset')
     ax2.set_xlabel('No. of Values')
     ax2.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.)
 
+    if not drop_cols:
+        '''
+         Graphic Display ~ Coefficient Bar Graph
+         '''
+        # Weights Bar Graph
+        labels = ['Temperature', 'Ambient Pressure', 'Relative Humidity', 'Exhaust Vacuum', 'Bias']
+        x = np.arange(len(labels))  # Location of Labels
+        width = .5  # Width of the bars
+        figureW, axW = plt.subplots()
+        bars = axW.bar(x, coef, width, color='#ff4f72')  # Coef is from Weight Print
+        axW.set_ylabel('Weight')
+        axW.set_title('Coefficients')
+        axW.set_xticks(x)
+        axW.set_xticklabels(labels)
+
     plt.show()
+
 '''
     Main Function
 '''
 if __name__ == '__main__':
     print("Part 1 of Enhanced Gradient Descent")
     # State is the seeded order of data that is randomized in train-test-split from sklearn
-    state = 4
+    state = 5
     main(state)
