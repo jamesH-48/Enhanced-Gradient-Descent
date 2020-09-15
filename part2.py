@@ -103,7 +103,7 @@ def main(state):
     '''
     drop_cols = False
     print_data_graphs = False
-    split_size = .1
+    split_size = .2
     X_train, X_test, Y_train, Y_test = pre_process(data, state, drop_cols, print_data_graphs, split_size=split_size)
 
     '''
@@ -175,19 +175,20 @@ def main(state):
     ax2.set_xlabel('No. of Values')
     ax2.legend(bbox_to_anchor=(1, 1), loc='upper left', borderaxespad=0.)
 
-    '''
-     Graphic Display ~ Coefficient Bar Graph
-     '''
-    # Weights Bar Graph
-    labels = ['Temperature', 'Ambient Pressure', 'Relative Humidity', 'Exhaust Vacuum', 'Bias']
-    x = np.arange(len(labels))  # Location of Labels
-    width = .5  # Width of the bars
-    figureW, axW = plt.subplots()
-    bars = axW.bar(x, regr.coef_, width, color='#ff4f72')  # Coef is from Weight Print
-    axW.set_ylabel('Weight')
-    axW.set_title('Coefficients')
-    axW.set_xticks(x)
-    axW.set_xticklabels(labels)
+    if not drop_cols:
+        '''
+         Graphic Display ~ Coefficient Bar Graph
+         '''
+        # Weights Bar Graph
+        labels = ['Temperature', 'Ambient Pressure', 'Relative Humidity', 'Exhaust Vacuum', 'Bias']
+        x = np.arange(len(labels))  # Location of Labels
+        width = .5  # Width of the bars
+        figureW, axW = plt.subplots()
+        bars = axW.bar(x, regr.coef_, width, color='#ff4f72')  # Coef is from Weight Print
+        axW.set_ylabel('Weight')
+        axW.set_title('Coefficients')
+        axW.set_xticks(x)
+        axW.set_xticklabels(labels)
 
     plt.show()
 
